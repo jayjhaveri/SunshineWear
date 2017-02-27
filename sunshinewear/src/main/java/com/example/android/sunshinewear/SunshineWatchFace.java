@@ -102,6 +102,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         Paint mIcon;
         Paint mHighTemp;
         Paint mLowTemp;
+        Paint mNoInfo;
 
         boolean mAmbient;
         Calendar mCalendar;
@@ -209,6 +210,9 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mHighTemp = new Paint();
             mHighTemp = createTextPaint(resources.getColor(R.color.white));
 
+            mNoInfo = new Paint();
+            mNoInfo = createTextPaint(resources.getColor(R.color.white));
+
             mLowTemp = new Paint();
             mLowTemp = createTextPaint(resources.getColor(R.color.colorPrimaryLight));
 
@@ -301,12 +305,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             float textSizeDate = resources.getDimension(R.dimen.digital_text_size_date);
             mTextPaintDate.setTextSize(textSizeDate);
-            if (highTemp!=null){
-                mHighTemp.setTextSize(textSizeDate);
-            }else {
-                mHighTemp.setTextSize(resources.getDimension(R.dimen.no_info));
-            }
-
+            mHighTemp.setTextSize(textSizeDate);
+            mNoInfo.setTextSize(resources.getDimension(R.dimen.no_info));
             mLowTemp.setTextSize(textSizeDate);
             mTextPaint.setTextSize(textSize);
         }
@@ -401,7 +401,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             if (highTemp != null && lowTemp != null) {
 
-                float tempY = y + 40;
+                float tempY = y + 50;
 
                 width = mHighTemp.measureText(highTemp);
                 canvas.drawText(highTemp, x - width / 2f, tempY, mHighTemp);
@@ -415,8 +415,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }else {
                 float tempY = y + 40;
                 String no_information  = getResources().getString(R.string.no_information);
-                width = mHighTemp.measureText(no_information);
-                canvas.drawText(no_information, x - width / 2f, tempY, mHighTemp);
+                width = mNoInfo.measureText(no_information);
+                canvas.drawText(no_information, x - width / 2f, tempY, mNoInfo);
             }
 
         }
