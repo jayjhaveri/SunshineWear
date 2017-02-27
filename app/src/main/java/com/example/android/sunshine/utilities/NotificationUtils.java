@@ -29,6 +29,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class NotificationUtils {
 
@@ -142,7 +143,7 @@ public class NotificationUtils {
             /* WEATHER_NOTIFICATION_ID allows you to update or cancel the notification later on */
             notificationManager.notify(WEATHER_NOTIFICATION_ID, notificationBuilder.build());
 
-            sendToWear(context,largeIcon,high,low);
+            sendToWear(context,BitmapFactory.decodeResource(resources, smallArtResourceId),high,low);
 
             /*
              * Since we just showed a notification, save the current time. That way, we can check
@@ -208,7 +209,7 @@ public class NotificationUtils {
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(@Nullable Bundle bundle) {
-
+                        Log.d("WearApp","connect");
                     }
 
                     @Override
@@ -219,14 +220,14 @@ public class NotificationUtils {
 
         mGoogleApiClient.connect();
 
-//        Asset asset = createAssetFromBitmap(largeIcon);
+        Asset assetWeather = createAssetFromBitmap(Bitmap.createScaledBitmap(largeIcon,52,52,true));
 
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_PATH);
         putDataMapRequest.setUrgent();
         putDataMapRequest.getDataMap().putString(HIGH_TEMP_KEY, SunshineWeatherUtils.formatTemperature(context, high));
         Log.d("high temp",SunshineWeatherUtils.formatTemperature(context,high));
         putDataMapRequest.getDataMap().putString(LOW_TEMP_KEY, SunshineWeatherUtils.formatTemperature(context, low));
-//        putDataMapRequest.getDataMap().putAsset(ICON_KEY, asset);
+        putDataMapRequest.getDataMap().putAsset(ICON_KEY, assetWeather);
         putDataMapRequest.getDataMap().putLong("timestamp", System.currentTimeMillis());
 
         PutDataRequest request = putDataMapRequest.asPutDataRequest();
@@ -238,14 +239,24 @@ public class NotificationUtils {
                 } else {
                     Log.e("Watch Log", "Failed to send weather info ");
                 }
-                mGoogleApiClient.disconnect();
             }
         });
     }
 
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
-        return Asset.createFromBytes(byteStream.toByteArray());
+        ByteArrayOutputStream byteStream = null;
+        try {
+            byteStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+            return Asset.createFromBytes(byteStream.toByteArray());
+        } finally {
+            if (null != byteStream) {
+                try {
+                    byteStream.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
     }
 }
