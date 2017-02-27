@@ -136,11 +136,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     if (event.getType() == DataEvent.TYPE_CHANGED &&
                             event.getDataItem().getUri().getPath().equals(WEATHER_PATH)) {
                         DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-                        final Asset profileAsset = dataMapItem.getDataMap().getAsset(ICON_KEY);
+                        final Asset icon = dataMapItem.getDataMap().getAsset(ICON_KEY);
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                weatherIcon = loadBitmapFromAsset(mGoogleApiClient ,profileAsset);
+                                weatherIcon = loadBitmapFromAsset(mGoogleApiClient ,icon);
                             }
                         }).start();
 
